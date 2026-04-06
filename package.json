@@ -1,0 +1,50 @@
+{
+  "name": "@uaziz1/mcp-slim",
+  "version": "0.1.0",
+  "description": "Self-learning MCP proxy. Watches your Claude Code usage, generates optimized proxies, cuts token costs by 99%.",
+  "type": "module",
+  "bin": {
+    "mcp-slim": "./bin/mcp-slim.js"
+  },
+  "main": "src/server.js",
+  "files": [
+    "bin/",
+    "src/",
+    "skills/",
+    "setup",
+    "docs/",
+    "LICENSE",
+    "README.md",
+    "CLAUDE.md"
+  ],
+  "scripts": {
+    "start": "node bin/mcp-slim.js",
+    "validate": "node bin/mcp-slim.js validate",
+    "observe": "node bin/mcp-slim.js observe",
+    "evolve": "node bin/mcp-slim.js evolve",
+    "status": "node bin/mcp-slim.js status"
+  },
+  "keywords": [
+    "mcp",
+    "claude",
+    "claude-code",
+    "proxy",
+    "model-context-protocol",
+    "token-reduction",
+    "cost-optimization",
+    "self-learning"
+  ],
+  "author": "Umair Aziz",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uaziz1/mcp-slim.git"
+  },
+  "homepage": "https://github.com/uaziz1/mcp-slim",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}

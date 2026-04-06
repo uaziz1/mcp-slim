@@ -1,0 +1,58 @@
+#!/bin/bash
+#
+# mcp-slim skill installer
+#
+# Registers mcp-slim slash commands with Claude Code by creating
+# symlinks in ~/.claude/skills/. Following the gstack pattern.
+#
+# Usage:
+#   ./setup              Install globally (~/.claude/skills/)
+#   ./setup --local      Install locally (.claude/skills/)
+#
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SKILLS_SOURCE="$SCRIPT_DIR/skills"
+
+# Determine target directory
+if [ "$1" = "--local" ]; then
+  SKILLS_TARGET=".claude/skills"
+  echo "Installing mcp-slim skills locally to $SKILLS_TARGET/"
+else
+  SKILLS_TARGET="$HOME/.claude/skills"
+  echo "Installing mcp-slim skills to $SKILLS_TARGET/"
+fi
+
+# Create target directory
+mkdir -p "$SKILLS_TARGET"
+
+# Link each skill directory
+linked=0
+for skill_dir in "$SKILLS_SOURCE"/*/; do
+  if [ ! -f "$skill_dir/SKILL.md" ]; then
+    continue
+  fi
+
+  dir_name="$(basename "$skill_dir")"
+
+  # Extract skill name from SKILL.md frontmatter
+  skill_name=$(grep -m1 '^name:' "$skill_dir/SKILL.md" | sed 's/^name:[[:space:]]*//')
+
+  if [ -z "$skill_name" ]; then
+    skill_name="$dir_name"
+  fi
+
+  # Create symlink
+  ln -snf "$skill_dir" "$SKILLS_TARGET/$skill_name"
+  echo "  /$skill_name -> $skill_dir"
+  linked=$((linked + 1))
+done
+
+echo ""
+echo "Registered $linked skills. Restart Claude Code to activate."
+echo ""
+echo "Commands available:"
+echo "  /slim-status   - Show proxy status and stats"
+echo "  /slim-evolve   - Run the self-learning evolution loop"
+echo "  /slim-observe  - Scan sessions for raw MCP patterns"

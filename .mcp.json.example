@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "mcp-slim": {
+      "command": "npx",
+      "args": ["-y", "@uaziz1/mcp-slim"],
+      "env": {
+        "MCP_SLIM_MODULES": "~/.mcp-slim/modules",
+        "NOTION_TOKEN": "ntn_your_notion_integration_token",
+        "HUBSPOT_TOKEN": "pat-na1-your_hubspot_private_app_token"
+      }
+    }
+  }
+}
