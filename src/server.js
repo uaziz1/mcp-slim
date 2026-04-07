@@ -17,6 +17,7 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import { sanitizeTools } from "./shared.js";
 
 const SKIP = new Set(["shared.js"]);
 
@@ -41,7 +42,7 @@ export async function startServer(modulesDir, { name = "mcp-slim", version = "0.
     }
   }
 
-  const allTools = modules.flatMap(m => m.tools || []);
+  const allTools = sanitizeTools(modules.flatMap(m => m.tools || []));
 
   const seenTools = new Set();
   for (const tool of allTools) {
