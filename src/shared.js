@@ -427,6 +427,52 @@ export function mdTable(headers, rows) {
   return lines.join("\n");
 }
 
+// ── Tool description sanitization ─────────────────────────────────────────
+
+/**
+ * Strip invisible/non-printable Unicode codepoints from a string.
+ * Preserves normal whitespace (space, tab, newline, carriage return).
+ * Targets: control chars, zero-width chars, directional overrides,
+ * Unicode Tags (U+E0001-U+E007F), variation selectors supplement.
+ */
+const INVISIBLE_RE = /[\x00-\x08\x0E-\x1F\x7F-\x9F\xAD\u200B-\u200F\u2028-\u202F\u2060-\u2064\u2066-\u206F\uFEFF\uFFF9-\uFFFB\u{E0001}-\u{E007F}\u{E0100}-\u{E01EF}]/gu;
+
+export function stripInvisible(str) {
+  if (typeof str !== "string") return str;
+  return str.replace(INVISIBLE_RE, "");
+}
+
+function sanitizeSchema(schema) {
+  if (!schema || typeof schema !== "object") return schema;
+  const result = { ...schema };
+  if (typeof result.description === "string") {
+    result.description = stripInvisible(result.description);
+  }
+  if (result.properties) {
+    result.properties = Object.fromEntries(
+      Object.entries(result.properties).map(([k, v]) => [k, sanitizeSchema(v)])
+    );
+  }
+  if (result.items) {
+    result.items = sanitizeSchema(result.items);
+  }
+  return result;
+}
+
+/**
+ * Sanitize tool definitions by stripping invisible Unicode from
+ * description fields (tool-level and nested inputSchema properties).
+ * Closes the prompt injection vector where hidden instructions are
+ * embedded in MCP tool descriptions using non-printable codepoints.
+ */
+export function sanitizeTools(tools) {
+  return tools.map(tool => ({
+    ...tool,
+    description: stripInvisible(tool.description),
+    inputSchema: sanitizeSchema(tool.inputSchema),
+  }));
+}
+
 // ── MCP response wrappers ──────────────────────────────────────────────────
 
 /** Wrap text in MCP tool response format. */
